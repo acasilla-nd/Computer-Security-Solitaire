@@ -1,0 +1,152 @@
+#solitaire solver for one draw where you can see all of the cards
+import copy, sys
+#sys.setrecursionlimit(10000)
+ps=['p0', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6']
+ts=["t0","t1","t2","t3"]
+
+#card values
+suits={"heart":0,"diamond":1,"club":2,"spade":3}
+values={'2': 1, '3': 2, '4': 3, '5': 4, '6': 5, '7': 6, '8': 7, '9': 8, '10': 9, "ace":0,"jack":10,"queen":11,"king":12}
+
+def make_card(suit,value,hidden): #hidden by the normal rules of solitaire
+    return 16*suits[suit]+values[value]+64*int(hidden)
+
+def make_state(deck,piles,top): #for hashing only. Otherwise the arrays are easier to use
+    state=""
+    d=" ".join([str(x) for x in deck])
+    state+=d+"&"
+    for pile in piles:
+        state+=" ".join([str(x) for x in pile])+"&"
+    for t in top:
+        state+=" ".join([str(x) for x in t])+"&"
+    return state[:-1]
+
+#last just means there are no cards attached below it
+def match_spots(card,piles,top,last): #given a card, where can you put it?
+    places=[]
+    if((1<<6)&card): #if card is hidden, can't move
+        return places
+    suit=(card>>4)%4
+    
+    if(last): #can only put onto the top if there is nothing below the card in its pile
+        if(not top[suit]):
+            if(card==16*suit): #ace on empty top
+                places.append((ts[suit],0))
+        else:
+            if(card==top[suit][-1]+1):
+                places.append((ts[suit],len(top[suit])))
+                
+    for i in range(len(piles)): #check piles
+        if(not piles[i]): #empty so can only put king
+            if(card%16==values["king"]):
+                places.append((ps[i],0))
+            continue
+        t=piles[i][-1]
+        if(t%16==card%16+1 and suit//2!=(t>>5)%2): #value has to be one greater and suit a different color
+            places.append((ps[i],len(piles[i])))
+    return places
+    
+#move notation: (s1,s2) where s1 is the original location of the card and s2 is where it's being moved
+#locations will be like ("p2",0) which is the bottom of pile 2
+#for cycling the deck, we will just do the deck to itself basically
+def legal_moves(deck,piles,top):
+    moves=[]
+    
+    #instead of making every shuffle a move, we just look at the whole thing at once. Much faster this way
+    for i in range(len(deck)):
+        for move in match_spots(deck[i],piles,top,1):
+            moves.append((("d",i),move))
+ 
+    for i in range(len(piles)): #check every stack on piles. Can consider any index
+        for j in range(len(piles[i])):
+            if((1<<6)&piles[i][j]): #can't move if hidden
+                continue
+            #i don't think i want it to just throw stuff back and forth between the stacks
+            if(j!=len(piles[i])-1 and j!=0 and not (1<<6)&piles[i][j-1]):
+                continue
+            last=j==len(piles[i])-1
+            for move in match_spots(piles[i][j],piles,top,last):
+                if(j==0 and move[0][0]=="p" and move[1]==0): #stopping it from shuffling around empty spots for no reason
+                    continue
+                if(j!=0 and piles[i][j]%16!=12 and not (1<<6)&piles[i][j-1] and move[0][0]=="p"): #don't want shuffling front for 0 reason
+                    continue
+                moves.append(((ps[i],j),move))
+    
+    #okay yeah we don't need to check pulling stuff off the top...
+    #for i in range(len(top)): #check every stack on top. Only consider top here
+        #if(top[i]):
+           #for move in match_spots(top[i][-1],piles,top,False): #last is technically true here but it doesnt matter
+                #moves.append(((ts[i],len(top[i])-1),move))
+        
+    return moves
+    
+def make_move(move,deck,piles,top): #only legal moves should be called here, otherwise an error likely will occur
+    if(move[0][0][0]=="p"): #moving from pile, might have to reveal card underneath
+        ind=int(move[0][0][1])
+        spot=move[0][1]
+        card=piles[ind][spot]
+        ind2=int(move[1][0][1])
+        if(move[1][0][0]=="t"): #to top
+            top[ind2].append(card)
+        else: #to another pile
+            stack=piles[ind][spot:]
+            piles[ind2]+=stack
+        piles[ind]=piles[ind][:spot]
+        if(piles[ind] and piles[ind][-1]&(1<<6)): #if hidden, reveal
+            piles[ind][-1]&=63
+    elif(move[0][0][0]=="t"): #moving from top
+        #only valid move is to some pile
+        ind=int(move[0][0][1])
+        ind2=int(move[1][0][1])
+        card=top[ind][move[0][1]]
+        piles[ind2].append(card)
+        top[ind]=top[ind][:-1] #remove card from top pile
+    elif(move[0][0][0]=="d"): #moving from deck to either pile or top
+        ind=move[0][1]
+        card=deck.pop(ind)
+        ind2=int(move[1][0][1])
+        if(move[1][0][0]=="t"): #to top
+            top[ind2].append(card)
+        else: #to some pile
+            piles[ind2].append(card)
+    return (deck,piles,top)
+    
+def solve(deck,piles,top,memo={}):
+    if(len(top[0])==13 and len(top[1])==13 and len(top[2])==13 and len(top[3])==13): #winning state
+        return ([],True)
+    shash=make_state(deck,piles,top)
+    if(shash in memo):
+        return memo[shash]
+    memo[shash]=([],False)
+    sol=[]
+    for move in legal_moves(deck,piles,top):
+        #deref all for temp variables for recursion
+        tdeck=list(deck)
+        tpiles=copy.deepcopy(piles)
+        ttop=copy.deepcopy(top)
+        tdeck,tpiles,ttop=make_move(move,tdeck,tpiles,ttop)
+        thash=make_state(tdeck,tpiles,ttop)
+        if(thash in memo):
+            continue
+        r1,r2=solve(tdeck,tpiles,ttop,memo)
+        if(r2): #could return a shorter one but eh just go for the first one you find
+            sol=[move]+r1
+            break
+    if(sol):
+        memo[shash]=(sol,True)
+    return memo[shash]
+        
+
+#example values for testing
+top=[[],[],[],[]]
+"""
+piles=[[26], [80, 2], [106, 114, 8], [96, 103, 75, 58], [105, 102, 119, 108, 10], [99, 70, 113, 65, 84, 19], [69, 85, 82, 71, 100, 89, 3]]
+deck=[60, 33, 24, 0, 57, 17, 27, 12, 23, 54, 9, 53, 56, 51, 40, 48, 52, 59, 34, 22, 4, 37, 43, 28]
+"""
+
+deck=[10, 9, 56, 22, 32, 26, 49, 23, 24, 48, 18, 54, 34, 27, 41, 59, 19, 52, 60, 21, 42, 17, 51, 37]
+piles=[[25], [100, 43], [121, 71, 38], [76, 67, 68, 20], [97, 65, 122, 66, 40], [64, 70, 108, 119, 72, 35], [103, 80, 117, 75, 69, 92, 50]]
+
+sol=solve(deck,piles,top)[0]
+print(sol)
+print(len(sol))
