@@ -18,6 +18,7 @@ def make_state(deck,piles,top): #for hashing only. Otherwise the arrays are easi
     for pile in piles:
         if(not pile):
             state+="~"
+        #only putting hidden cards in the pile into the state because the locations of the other cards actually doesn't matter based on the moves we are doing, but i did have to design it that way
         state+=" ".join([str(x) for x in pile if (1<<6)&x])+"&"
     state=state[:-1]+"&"
     for t in top:
@@ -84,7 +85,7 @@ def legal_moves(deck,piles,top,deckind):
         
     return moves
     
-def make_move(move,deck,piles,deckind,top): #only legal moves should be called here, otherwise an error likely will occur
+def make_move(move,deck,piles,top,deckind): #only legal moves should be called here, otherwise an error likely will occur
     if(move[0][0][0]=="p"): #moving from pile, might have to reveal card underneath
         ind=int(move[0][0][1])
         spot=move[0][1]
@@ -129,7 +130,7 @@ def solve(deck,piles,top,deckind=24,memo={}):
         tdeck=list(deck)
         tpiles=copy.deepcopy(piles)
         ttop=copy.deepcopy(top)
-        tdeck,tpiles,ttop,tdeckind=make_move(move,tdeck,tpiles,deckind,ttop)
+        tdeck,tpiles,ttop,tdeckind=make_move(move,tdeck,tpiles,ttop,deckind)
         thash=make_state(tdeck,tpiles,ttop)
         if(thash in memo):
             continue
@@ -141,9 +142,8 @@ def solve(deck,piles,top,deckind=24,memo={}):
         memo[shash]=(sol,True)
     return memo[shash]
         
-def expand_moves(moves,deck,piles,top):
+def expand_moves(moves,deck,piles,top,deckind=24):
     newmoves=[]
-    deckind=len(deck)
     for i in range(len(moves)):
         move=moves[i]
         if(move[0][0]=="d"):
@@ -157,6 +157,7 @@ def expand_moves(moves,deck,piles,top):
             newmoves.append((("d",0),move[1]))
         else:
             newmoves.append(move)
+        deck,piles,top,deckind=make_move(move,deck,piles,top,deckind)
     return newmoves
             
 
@@ -170,10 +171,10 @@ deck=[60, 33, 24, 0, 57, 17, 27, 12, 23, 54, 9, 53, 56, 51, 40, 48, 52, 59, 34, 
 
 deck=[10, 9, 56, 22, 32, 26, 49, 23, 24, 48, 18, 54, 34, 27, 41, 59, 19, 52, 60, 21, 42, 17, 51, 37]
 piles=[[25], [100, 43], [121, 71, 38], [76, 67, 68, 20], [97, 65, 122, 66, 40], [64, 70, 108, 119, 72, 35], [103, 80, 117, 75, 69, 92, 50]]
-
+#print(legal_moves(deck,piles,top,24))
 sol=solve(deck,piles,top)[0]
-s=expand_moves(sol,deck,piles,top)
-#print(s)
-#print(len(s))
+s=expand_moves(sol,deck,piles,top,24)
+print(s)
 print(sol)
+print(len(s))
 print(len(sol))
