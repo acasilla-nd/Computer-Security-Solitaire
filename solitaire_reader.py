@@ -4,9 +4,6 @@ import pymem.process
 # Decodes the identify of a card
 def decode_card(raw_id):
     
-    if raw_id == 0:
-        return None, None, None
-
     # Check the 15th bit for the face up flag
     is_face_down = (raw_id & 0x8000) == 0
     
