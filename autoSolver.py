@@ -89,6 +89,12 @@ def get_coords(layout, zone, index=0, hiddenCardsHeight=0, visibleCardsHeight=0,
 
 def solveGame(instructions=[]):
     layout, win = get_dynamic_layout("Solitaire")
+
+    if win:
+        win.resizeTo(1202, 886)
+        time.sleep(1) # Let the UI catch up
+        layout, win = get_dynamic_layout() # Re-get layout after resize
+
     if not layout: 
         sys.exit("[-] Solitaire not found.")
 
