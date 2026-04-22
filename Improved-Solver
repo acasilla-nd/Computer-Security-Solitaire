@@ -4,7 +4,7 @@ import copy
 #sys.setrecursionlimit(10000)
 ps=['p0', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6']
 ts=["t0","t1","t2","t3"]
-breaklim=50000
+breaklim=50000 #heuristic for cutting off the algorithm after searching a certain number of states, signifying that the given setup is likely impossible
 
 #card values
 suits={"heart":0,"diamond":1,"club":2,"spade":3}
