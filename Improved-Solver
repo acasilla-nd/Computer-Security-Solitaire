@@ -4,6 +4,7 @@ import copy
 #sys.setrecursionlimit(10000)
 ps=['p0', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6']
 ts=["t0","t1","t2","t3"]
+breaklim=50000
 
 #card values
 suits={"heart":0,"diamond":1,"club":2,"spade":3}
@@ -125,6 +126,8 @@ def solve(deck,piles,top,deckind=24,memo={}):
     if(shash in memo):
         return memo[shash]
     memo[shash]=([],False)
+    if(len(memo)>breaklim):
+        return ([],False)
     sol=[]
     for move in legal_moves(deck,piles,top,deckind):
         #deref all for temp variables for recursion
