@@ -15,8 +15,15 @@ pyautogui.FAILSAFE = False
 pyautogui.PAUSE = 0.05  # Cuts the "wait" between actions in half
 
 # Used to determine the 'Fixed' card sizes and vertical anchors
+width, height = pyautogui.size()
 BASE_W = 1202
 BASE_H = 886
+
+#Other Resolution
+#3840x2400
+
+#My Resolution
+#2940x1846
 
 def force_focus(hwnd):
     if win32gui.IsIconic(hwnd):
@@ -42,53 +49,41 @@ def get_dynamic_layout(title="Solitaire"):
 
 def get_coords(layout, zone, index=0, hiddenCardsHeight=0, visibleCardsHeight=0, cardsGrabbed=1):
     L, T = layout["left"], layout["top"]
+    W, H = layout["width"], layout["height"]
 
-    if (L < 0):
-        L = 0
+    # This tells us: "The current window is X times larger than the original"
+    scale_x = W / 1202
+    scale_y = H / 886
 
-    W = layout["width"]
-    H = BASE_H
-
-    # --- ELASTIC X-LOGIC ---
-    # Based on 1202px width, we assume a card + gap takes up 
-    # roughly 1/7.5 of the width.
-    # Estimated Card Width (in pixels) that stays constant:
-    CARD_W = 140
+    CARD_W = 140 * scale_x
+    y_hidden_cards_height = 6.2 * scale_y
+    y_visible_cards_height = y_hidden_cards_height * 5
     
-    # Calculate the remaining space
-    # There are 7 columns. We subtract the card widths from the total window.
+    # 3. Horizontal Logic (Using the Scaled CARD_W)
     remaining_space = W - (CARD_W * 7)
-    
-    # Distribute the space into 8 margins (Outer left, 6 gaps, Outer right)
     avg_margin = remaining_space / 8
-    
-    # Calculate the center of the target column
-    # (Margin * (index + 1)) + (CardWidth * index) + (Half a card to hit center)
     x_pos = L + (avg_margin * (index + 1)) + (CARD_W * index) + (CARD_W / 2)
 
+    # 4. Vertical Logic (Using percentages of the current Window Height H)
+    # We use the ratios (0.225, 0.357) because they scale perfectly with H
     y_top_row = T + (H * 0.225)
-    #y_tab_base = T + (H * 0.4)
-    y_tab_base = T + (H * 0.357) + 10
-    y_hidden_cards_height = 6.2
-    y_visible_cards_height = y_hidden_cards_height * 5
+    y_tab_base = T + (H * 0.357) + (10 * scale_y)
 
     if zone == 'deck':
-        # The deck is the top left place to click to see new cards
         return L + avg_margin + (CARD_W / 2), y_top_row
     
     elif zone == 'waste':
-        # The waste is where the cards clicked from the deck go to 
         return L + (avg_margin * 2) + CARD_W + (CARD_W / 2), y_top_row
     
     elif zone == 'sortedCol':
-        # sortedCol is just the solutions for each col
         slot_idx = 3 + index
         return L + (avg_margin * (slot_idx + 1)) + (CARD_W * slot_idx) + (CARD_W / 2), y_top_row
     
     elif zone == 'tableau':
-        #tableau is the playing area where cards are stacked
-
-        return x_pos, y_tab_base + (hiddenCardsHeight * y_hidden_cards_height) + ((visibleCardsHeight-cardsGrabbed) * y_visible_cards_height)
+        # Apply the scaled vertical offsets
+        y_offset = (hiddenCardsHeight * y_hidden_cards_height) + \
+                   ((visibleCardsHeight - cardsGrabbed) * y_visible_cards_height)
+        return x_pos, y_tab_base + y_offset
 
     return x_pos, y_top_row
 
