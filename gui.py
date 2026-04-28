@@ -141,7 +141,7 @@ class SolitaireAssistant:
             elif "p" in location2 and len(location2) == 2:
                 location2 = "Tableau"
 
-            self.moves_listbox.insert(tk.END, f"Step: {i+1}: {location1}{num1} {indexStr} -> {location2}{num2}")
+            self.moves_listbox.insert(tk.END, f"Step {i+1}: {location1}{num1} {indexStr} -> {location2}{num2}")
         
         self.status_label.config(text=f"SOLVED: {len(self.solution_moves)} moves", fg="green")
         self.auto_btn.config(state="normal")
