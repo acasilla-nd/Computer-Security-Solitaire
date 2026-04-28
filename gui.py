@@ -39,7 +39,7 @@ class SolitaireAssistant:
         self.solve_btn.grid(row=0, column=1, padx=5)
 
         # Moves Display
-        moves_frame = tk.LabelFrame(self.root, text="Suggested Moves (The 'Prompt')", padx=10, pady=10)
+        moves_frame = tk.LabelFrame(self.root, text="Suggested Moves", padx=10, pady=10)
         moves_frame.pack(fill="both", expand=True, padx=20, pady=10)
 
         self.moves_listbox = tk.Listbox(moves_frame, font=("Courier", 10))
