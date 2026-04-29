@@ -86,7 +86,7 @@ class SolitaireAssistant:
         def solve_thread():
             top = [[], [], [], []]
             # Solve returns (moves, success)
-            sol, success = Improved_Solver.solve(self.current_deck, self.current_piles, top)
+            sol, success = Improved_Solver.solve(self.current_deck, self.current_piles, top, memo={})
             
             if success:
                 # Expand moves to include deck shuffles
