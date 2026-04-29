@@ -36,7 +36,7 @@ def main():
         pm = pymem.Pymem(process_name)
     except pymem.exception.ProcessNotFound:
         print(f"Error: {process_name} not found")
-        return
+        return None, None
 
     # Get the base address
     module = pymem.process.module_from_name(pm.process_handle, process_name)
@@ -51,7 +51,7 @@ def main():
         
         if master_obj_addr == 0:
             print("Error: Game object is NULL. Please start a new game and try again")
-            return
+            return None, None
             
         # Stack array starts at +0x6C from the Master Object
         tableau_base = master_obj_addr + 0x6C
