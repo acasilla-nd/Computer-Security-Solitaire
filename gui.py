@@ -8,7 +8,7 @@ import autoSolver
 class SolitaireAssistant:
     def __init__(self, root):
         self.root = root
-        self.root.title("Computer Security: Solitaire GUI")
+        self.root.title("Computer Security: Topic 2 GUI")
         self.root.geometry("1000x800")
         #self.root.attributes("-topmost", True)  # Keep on top of game
 
