@@ -19,6 +19,9 @@ width, height = pyautogui.size()
 BASE_W = 1202
 BASE_H = 886
 
+widthScale = width/BASE_W
+heightScale = height/BASE_H
+
 #Other Resolution
 #3840x2400
 
@@ -91,7 +94,7 @@ def solveGame(instructions=[]):
     layout, win = get_dynamic_layout("Solitaire")
 
     if win:
-        win.resizeTo(1202, 886)
+        win.resizeTo(1202*widthScale, 886*heightScale)
         time.sleep(1) # Let the UI catch up
         layout, win = get_dynamic_layout() # Re-get layout after resize
 
