@@ -166,7 +166,7 @@ def expand_moves(moves,deck,piles,top,deckind=24):
             
 
 #example values for testing
-top=[[],[],[],[]]
+#top=[[],[],[],[]]
 """
 #unsolvable one apparently
 piles=[[26], [80, 2], [106, 114, 8], [96, 103, 75, 58], [105, 102, 119, 108, 10], [99, 70, 113, 65, 84, 19], [69, 85, 82, 71, 100, 89, 3]]
@@ -176,12 +176,12 @@ deck=[60, 33, 24, 0, 57, 17, 27, 12, 23, 54, 9, 53, 56, 51, 40, 48, 52, 59, 34, 
 #deck=[10, 9, 56, 22, 32, 26, 49, 23, 24, 48, 18, 54, 34, 27, 41, 59, 19, 52, 60, 21, 42, 17, 51, 37]
 #piles=[[25], [100, 43], [121, 71, 38], [76, 67, 68, 20], [97, 65, 122, 66, 40], [64, 70, 108, 119, 72, 35], [103, 80, 117, 75, 69, 92, 50]]
 
-deck,piles = solitaire_reader.main()
+#deck,piles = solitaire_reader.main()
 
 #print(legal_moves(deck,piles,top,24))
-sol=solve(deck,piles,top)[0]
-s=expand_moves(sol,deck,piles,top,24)
-print(s)
-print(sol)
-print(len(s))
-print(len(sol))
+#sol=solve(deck,piles,top)[0]
+#s=expand_moves(sol,deck,piles,top,24)
+#print(s)
+#print(sol)
+#print(len(s))
+#print(len(sol))
