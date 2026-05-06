@@ -200,7 +200,7 @@ def solveGame(instructions=[]):
             if location1 == "tableau":
                 pyautogui.moveTo(tx1, ty1, duration=0.2)
                 pyautogui.click()
-                time.sleep(0.1)
+                time.sleep(0.2)
 
                 tableauAllCardHeights[num1] -= cardsGrabbed
 
