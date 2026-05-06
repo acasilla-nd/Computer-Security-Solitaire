@@ -26,9 +26,11 @@ def decode_card(raw_id):
         
     return suit, rank, is_face_down
 
+# Translates the card information into the format used by our solver
 def translate_card(suit, rank, is_face_down):
     return 16*suit+rank+64*(is_face_down)
 
+# Main function to read the game state from memory
 def main():
     process_name = "sol.exe"
     
@@ -102,6 +104,7 @@ def main():
     except Exception as e:
         print(f"Critical error during memory read: {e}")
     
+    # Return the deck and tableaus 
     return deck, tableaus
 
 
