@@ -94,7 +94,7 @@ def solveGame(instructions=[]):
     layout, win = get_dynamic_layout("Solitaire")
 
     if win:
-        win.resizeTo(1202*int(widthScale), 886*int(heightScale))
+        #win.resizeTo(1202*int(widthScale), 886*int(heightScale))
         time.sleep(1) # Let the UI catch up
         layout, win = get_dynamic_layout() # Re-get layout after resize
 
